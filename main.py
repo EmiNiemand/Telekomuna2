@@ -8,13 +8,14 @@ def main():
     menu = int(input("Wpisz '1' żeby wysłać, albo '2' żeby odebrać: "))
     port_number = "COM"
     port_number += input("Podaj numer portu: ")
-
+    text = ""
     if menu == 1:
         with open('message') as f:
             lines = f.readlines()
-
+        for line in lines:
+            text += line
         serial_port = por.startSerialPort(port_number)
-        sen.sendMessage(serial_port, bytes(lines[0], 'ascii'))
+        sen.sendMessage(serial_port, bytes(text, 'ascii'))
         serial_port.close()
     elif menu == 2:
         checksum_type = int(input("Wpisz '1' - algebraiczna suma kontrolna, '2' - CRC: "))
