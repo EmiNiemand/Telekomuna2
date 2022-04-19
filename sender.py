@@ -51,8 +51,14 @@ def preparePackets(data: bytes, check_sum_type: char):
     # rób tyle razy ile jest bloków
     for packet_number in range(len(blocks)):
         packet = bytearray()
-        # tworzenie nagłówka pakietu
-        packet += createHeader(packet_number)
+        # Tworzenie 3-bajtowego headera:
+        # - bajt znaku SOH,
+        # - bajt numeru bloku,
+        # - bajt dopełnienia tego bloku do 255 (255 - numer bloku).
+        header = bytearray(var.SOH)
+        header.append((packet_number + 1) % 255)
+        header.append(255 - (packet_number % 255))
+        packet += header
 
         # dopełnienie ostatniego bloku do 128 bajtów (znakami SUB) i dodanie ich do pakietu
         if len(blocks[packet_number]) < 128:
@@ -65,18 +71,6 @@ def preparePackets(data: bytes, check_sum_type: char):
         packets.append(bytes(packet))
 
     return packets
-
-
-# Tworzenie 3-bajtowego headera:
-# - bajt znaku SOH,
-# - bajt numeru bloku,
-# - bajt dopełnienia tego bloku do 255 (255 - numer bloku).
-def createHeader(packet_number: int):
-    header = bytearray(var.SOH)
-    packet_number += 1
-    header.append(packet_number % 255)
-    header.append(255 - (packet_number % 255))
-    return header
 
 
 # Dodawanie na koniec bloku znaków SUB do osiągnięcia 128 bajtów.
