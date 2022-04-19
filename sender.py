@@ -4,7 +4,7 @@ import variables as var
 import checksums as che
 
 
-def send(serial_port: ser.Serial, data: bytes):
+def sendMessage(serial_port: ser.Serial, data: bytes):
     # Sprawdzam rodzaj checksumy (CRC / algebraiczna)
     check_sum_type = waitForChecksum(serial_port)
     # Przygotowuje pakiety w zależności od rodzaju checksumy
@@ -20,7 +20,8 @@ def send(serial_port: ser.Serial, data: bytes):
         elif response == var.NAK:
             continue
         else:
-            print("Błąd! Dostałem złą odpowiedź :(")
+            print("Błąd! Wysłana została nieodpowiednia wiadomość zwrotna")
+            raise Exception
 
     serial_port.write(var.EOT)
     response = serial_port.read()
@@ -38,8 +39,8 @@ def waitForChecksum(serial_port: ser.Serial):
             return var.NAK
         elif message == var.C:
             return var.C
-
     print("Błąd! Nikt nie chce mojej wiadomości :(")
+    raise Exception
 
 
 def preparePackets(data: bytes, check_sum_type: char):

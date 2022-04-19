@@ -36,7 +36,7 @@ def removeGarbage(data: bytes):
     return data
 
 
-def receive(serial_port: ser.Serial, check_sum_type: char):
+def receiveMessage(serial_port: ser.Serial, check_sum_type: char):
     result = bytearray()
     for i in range(20):
         # Wysyłanie jakiego rodzaju pakiety chcę otrzymywać.
