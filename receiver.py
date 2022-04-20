@@ -4,7 +4,6 @@ import variables as var
 import checksums as che
 
 
-# ===========================Functions==================
 def receiveMessage(serial_port: ser.Serial, check_sum_type: char):
     message = bytearray()
     for i in range(20):

@@ -1,6 +1,7 @@
 from numpy import char
 import variables as var
 
+
 # algebraiczna suma kontrolna
 def checksumAlgebraic(block: bytes):
     result = 0
@@ -8,6 +9,7 @@ def checksumAlgebraic(block: bytes):
         result += i
     result = result % 256
     return result.to_bytes(1, "big")
+
 
 # suma kontrolna CRC
 def checksumCRC(block: bytes):
