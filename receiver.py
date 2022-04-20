@@ -14,30 +14,31 @@ def receiveMessage(serial_port: ser.Serial, check_sum_type: char):
         while True:
             # Sprawdzanie poprawności pakietu
             block_of_data, state = checkPacket(serial_port, packet_number, check_sum_type)
+
             # Jeśli wszystko dobrze:
             match state:
                 case 0:
                     # Zapisuje kolejne części wiadomości do rozwiązania.
                     message += bytearray(block_of_data)
-                    print(message)
                     # Zwraca znak ACK do nadawcy.
                     serial_port.write(var.ACK)
                     packet_number += 1
-                    break
                 case 1:
                     # Czyszczenie portu.
                     # Jeśli nie odczytany pakiet nie jest prawidłowy, to wyślij NAK,
                     # żeby pakiet został wysłany jeszcze raz.
                     serial_port.read(serial_port.in_waiting)
                     serial_port.write(var.NAK)
-                    break
                 case 2:
                     # Zakończenie transferu i zwrócenie wiadomości.
                     serial_port.write(var.ACK)
                     return bytes(message)
                 case 3:
-                    # Jeżeli transfer nie został zaakceptowany lub skończył się czas nasłuchiwania.
-                    raise Exception
+                    # Jeżeli transfer nie został zaakceptowany.
+                    break
+
+    print("Transfer nie został zaakceptowany lub skończył się czas nasłuchiwania.")
+    raise Exception
 
 
 def checkPacket(serial_port: ser.Serial, packet_number: int, check_sum_type: char):
@@ -67,7 +68,7 @@ def checkPacket(serial_port: ser.Serial, packet_number: int, check_sum_type: cha
 def checkHeader(serial_port: ser.Serial, packet_number: int):
     # Sprawdzanie, czy pierwszy bajt jest równy znakowi SOH.
     header = serial_port.read(1)
-    print(header)
+
     # Wczytanie drugiego bajtu pakietu
     block_number = serial_port.read(1)
     # Zamienianie odczytanego bajtu na int.
