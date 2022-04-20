@@ -19,6 +19,7 @@ def receiveMessage(serial_port: ser.Serial, check_sum_type: char):
                 case 0:
                     # Zapisuje kolejne części wiadomości do rozwiązania.
                     message += bytearray(block_of_data)
+                    print(message)
                     # Zwraca znak ACK do nadawcy.
                     serial_port.write(var.ACK)
                     packet_number += 1
@@ -36,13 +37,14 @@ def receiveMessage(serial_port: ser.Serial, check_sum_type: char):
                     return bytes(message)
                 case 3:
                     # Jeżeli transfer nie został zaakceptowany lub skończył się czas nasłuchiwania.
-                    return bytes("Transfer nie zostal zaakceptowany lub skonczyl sie czas nasluchiwania.", 'ascii')
+                    raise Exception
 
 
 def checkPacket(serial_port: ser.Serial, packet_number: int, check_sum_type: char):
     # sprawdzanie poprawności nagłówka.
-    if checkHeader(serial_port, packet_number) != 0:
-        return bytearray(), checkHeader(serial_port, packet_number)
+    header = checkHeader(serial_port, packet_number)
+    if header != 0:
+        return bytearray(), header
 
     # Odczytanie bajtów wiadomości.
     data_block = serial_port.read(128)
@@ -57,7 +59,7 @@ def checkPacket(serial_port: ser.Serial, packet_number: int, check_sum_type: cha
     calculated_checksum = che.calculateChecksum(data_block, check_sum_type)
 
     if message_checksum != calculated_checksum:
-        return data_block, 1
+        return bytearray(), 1
 
     return data_block, 0
 
@@ -65,7 +67,7 @@ def checkPacket(serial_port: ser.Serial, packet_number: int, check_sum_type: cha
 def checkHeader(serial_port: ser.Serial, packet_number: int):
     # Sprawdzanie, czy pierwszy bajt jest równy znakowi SOH.
     header = serial_port.read(1)
-
+    print(header)
     # Wczytanie drugiego bajtu pakietu
     block_number = serial_port.read(1)
     # Zamienianie odczytanego bajtu na int.
