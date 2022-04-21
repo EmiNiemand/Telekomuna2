@@ -57,7 +57,7 @@ def preparePackets(data: bytes, check_sum_type: char):
         # - bajt dopełnienia tego bloku do 255 (255 - numer bloku).
         header = bytearray(var.SOH)
         header.append((packet_number + 1) % 255)
-        header.append(255 - (packet_number % 255))
+        header.append(255 - ((packet_number + 1) % 255))
         packet += header
 
         # dopełnienie ostatniego bloku do 128 bajtów (znakami SUB) i dodanie ich do pakietu
